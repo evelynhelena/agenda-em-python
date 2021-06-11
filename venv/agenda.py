@@ -85,12 +85,16 @@ def gerarPdf():
     pdf.save()
     print("PDF gerado com sucesso!")
 
+def voltar():
+    listaContatos.close()
+    agenda.show()
 
 app = QtWidgets.QApplication([])
 agenda = uic.loadUi("agenda.ui")
 listaContatos =  uic.loadUi("tableContato.ui")
 listaContatos.excluirContato.clicked.connect(excluirContato)
 listaContatos.gerarPdf.clicked.connect(gerarPdf)
+listaContatos.voltar.clicked.connect(voltar)
 
 agenda.btnCadastrar.clicked.connect(main)
 agenda.btnConsultar.clicked.connect(consultarContato)
