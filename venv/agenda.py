@@ -55,6 +55,51 @@ def excluirContato():
     cursor.execute("delete from tbl_dadosagendas where id = " + str(valorID))
     banco.commit()
 
+def updateConfirm():
+    campoNome = telaEdicao.nomeAlterar.text()
+    campoEmail = telaEdicao.emailAlterar.text()
+    campoTelefone = telaEdicao.telefoneAlterar.text()
+
+    if telaEdicao.rendencialAlterar.isChecked():
+        tipoTelefone = "Residencial"
+    elif telaEdicao.celularAlterar.isChecked():
+        tipoTelefone = "Celular"
+    else:
+        tipoTelefone = "Não Informado"
+    id = getid()
+    cursor = banco.cursor()
+    upadate = "UPDATE  tbl_dadosagendas SET nome = %s ,email = %s ,telefone = %s ,tipoContato = %s where id = " + str(id)
+    data = (str(campoNome), str(campoEmail), str(campoTelefone), tipoTelefone)
+    cursor.execute(upadate, data)
+    banco.commit()
+    print("alterado com sucersso")
+    telaEdicao.close()
+
+def getid():
+    linhaContato = listaContatos.tableWidget.currentRow()
+    cursor = banco.cursor()
+    select = "select id from tbl_dadosagendas"
+    cursor.execute(select)
+    contatos_lidos = cursor.fetchall()
+    id = contatos_lidos[linhaContato][0]
+
+    return id
+
+def alterarContato():
+    valorID = getid()
+    seletWhithID = "select * from tbl_dadosagendas where id = " + str(valorID)
+    cursor = banco.cursor()
+    cursor.execute(seletWhithID)
+    dadoLido = cursor.fetchall()
+    telaEdicao.show()
+    telaEdicao.nomeAlterar.setText(str(dadoLido[0][1]))
+    telaEdicao.emailAlterar.setText(str(dadoLido[0][2]))
+    telaEdicao.telefoneAlterar.setText(str(dadoLido[0][3]))
+    if(str(dadoLido[0][4]) == "Residencial"):
+        telaEdicao.rendencialAlterar.setChecked(True)
+    else:
+        telaEdicao.celularAlterar.setChecked(True)
+
 def gerarPdf():
     cursor = banco.cursor()
     select = "select * from tbl_dadosagendas"
@@ -91,10 +136,13 @@ def voltar():
 
 app = QtWidgets.QApplication([])
 agenda = uic.loadUi("agenda.ui")
-listaContatos =  uic.loadUi("tableContato.ui")
+listaContatos = uic.loadUi("tableContato.ui")
+telaEdicao = uic.loadUi("update.ui")
+telaEdicao.confirmar.clicked.connect(updateConfirm)
 listaContatos.excluirContato.clicked.connect(excluirContato)
 listaContatos.gerarPdf.clicked.connect(gerarPdf)
 listaContatos.voltar.clicked.connect(voltar)
+listaContatos.alterarContato.clicked.connect(alterarContato)
 
 agenda.btnCadastrar.clicked.connect(main)
 agenda.btnConsultar.clicked.connect(consultarContato)
