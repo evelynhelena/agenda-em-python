@@ -1,6 +1,7 @@
 from PyQt5 import uic, QtWidgets
 import mysql.connector
 from reportlab.pdfgen import canvas
+import easygui
 
 banco = mysql.connector.connect(
     host="localhost",
@@ -26,10 +27,12 @@ def main():
     data = (str(campoNome),str(campoEmail),str(campoTelefone),tipoTelefone)
     cursor.execute(insert,data)
     banco.commit()
-    print("salvo com sucersso")
+    easygui.msgbox("Contato Salvo com Sucesso", title="Sucesso")
     agenda.nome.setText("")
     agenda.email.setText("")
     agenda.telefone.setText("")
+    telaEdicao.rendencialAlterar.setChecked(False)
+    telaEdicao.celularAlterar.setChecked(False)
 
 def consultarContato():
     listaContatos.show()
@@ -54,6 +57,7 @@ def excluirContato():
     valorID = contatos_lidos[linhaContato][0]
     cursor.execute("delete from tbl_dadosagendas where id = " + str(valorID))
     banco.commit()
+    easygui.msgbox("Contato excluido com Sucesso", title="Sucesso")
 
 def updateConfirm():
     campoNome = telaEdicao.nomeAlterar.text()
@@ -72,7 +76,8 @@ def updateConfirm():
     data = (str(campoNome), str(campoEmail), str(campoTelefone), tipoTelefone)
     cursor.execute(upadate, data)
     banco.commit()
-    print("alterado com sucersso")
+    easygui.msgbox("Contato alterado com Sucesso", title="Sucesso")
+    listaContatos.close()
     telaEdicao.close()
 
 def getid():
@@ -128,7 +133,7 @@ def gerarPdf():
         pdf.drawString(500, 750 - y, str(contatos_lidos[i][4]))
 
     pdf.save()
-    print("PDF gerado com sucesso!")
+    easygui.msgbox("PDF gerado com sucesso", title="Sucesso")
 
 def voltar():
     listaContatos.close()
